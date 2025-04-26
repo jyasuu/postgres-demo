@@ -22,11 +22,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // ~ clear the output buffer
                 unsafe { buf.set_len(0) };
                 // ~ format the message for output
-                let _ = writeln!(buf, "{}:{}@{}:", ms.topic(), ms.partition(), m.offset);
+                // let _ = writeln!(buf, "{}:{}@{}:", ms.topic(), ms.partition(), m.offset);
                 buf.extend_from_slice(m.value);
                 buf.push(b'\n');
                 // ~ write to output channel
-                stdout.write_all(&buf)?;
+                // stdout.write_all(&buf)?;
+                let str = std::str::from_utf8(&buf);
+                println!("{:#?}", str);
                 // println!("{:?}", m);
             }
             let _ = consumer.consume_messageset(ms);
