@@ -5,5 +5,7 @@ services:
       - 'POSTGRES_DB=postgres'
       - 'POSTGRES_PASSWORD=postgres'
       - 'POSTGRES_USER=postgres'
+    volumes:
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     ports:
       - '5432:5432'
