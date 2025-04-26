@@ -9,3 +9,53 @@ services:
       - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
     ports:
       - '5432:5432'
+  zookeeper:
+    stdin_open: true
+    tty: true
+    container_name: zookeeper
+    ports:
+        - 2181:2181
+        - 2888:2888
+        - 3888:3888
+    image: quay.io/debezium/zookeeper:3.0
+  kafka:
+    stdin_open: true
+    tty: true
+    container_name: kafka
+    ports:
+        - 9092:9092
+    links:
+        - zookeeper:zookeeper
+    image: quay.io/debezium/kafka:3.0
+    environment:
+      - 'ZOOKEEPER_CONNECT=zookeeper:2181'
+  connect:
+    stdin_open: true
+    tty: true
+    container_name: connect
+    ports:
+        - 8083:8083
+    environment:
+        - GROUP_ID=1
+        - CONFIG_STORAGE_TOPIC=my_connect_configs
+        - OFFSET_STORAGE_TOPIC=my_connect_offsets
+        - STATUS_STORAGE_TOPIC=my_connect_statuses
+        - BOOTSTRAP_SERVERS=kafka:9092
+    links:
+        - kafka:kafka
+        - postgres:postgres
+    image: quay.io/debezium/connect:3.0
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.23.0
+    container_name: kafdrop
+    restart: always
+    ports:
+      - 9000:9000
+    links:
+        - kafka:kafka
+    environment:     
+      # 請改成自己的 kafka server 位置                                                                                                                          
+      KAFKA_BROKERCONNECT: kafka:9092
+      JVM_OPTS: "-Xms128M -Xmx256M"
+      SERVER_SERVLET_CONTEXTPATH: "/"
+      SERVER_PORT: 9000
