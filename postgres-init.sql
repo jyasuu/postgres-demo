@@ -1,3 +1,6 @@
+CREATE EXTENSION IF NOT EXISTS pageinspect;
+CREATE EXTENSION IF NOT EXISTS pgstattuple;
+
 -- Create a test table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
